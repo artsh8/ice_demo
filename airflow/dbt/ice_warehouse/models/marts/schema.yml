@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: customer_spending_detail
+    description: Траты покупателя с детализацией
+  
+  - name: customer_fav_merchant
+    description: Любимые продавцы покупателя
+

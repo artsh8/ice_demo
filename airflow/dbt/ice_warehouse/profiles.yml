@@ -1,0 +1,13 @@
+ice_warehouse:
+  target: dev
+  outputs:
+    dev:
+      type: trino
+      ssl: false
+      host: sql-engine
+      port: 8080
+      user: trino
+      pass: ''
+      database: iceberg
+      schema: order_source
+      threads: 4

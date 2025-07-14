@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: order_source
+    database: iceberg
+    schema: order_source
+
+    tables:
+      - name: customer
+        identifier: customer
+
+      - name: merchant
+        identifier: merchant
+
+      - name: product
+        identifier: product
+
+      - name: product_order
+        identifier: product_order

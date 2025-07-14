@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: product_popularity
+    description: Количество заказанных товаров
+
+  - name: customer_spending
+    description: Траты покупателя
+
+  - name: customer_loyalty
+    description: Лояльность покупателя

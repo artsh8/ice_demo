@@ -1,0 +1,78 @@
+services:
+  sql-engine:
+    image: trinodb/trino:476
+    volumes:
+      - ./trino/sourcedb.properties:/etc/trino/catalog/sourcedb.properties
+      - ./trino/iceberg.properties:/etc/trino/catalog/iceberg.properties
+    ports:
+      - 8080:8080
+
+  object-store:
+    # в случае ошибок откатиться на tag: RELEASE.2025-06-13T11-33-47Z
+    image: quay.io/minio/minio
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    ports:
+      - 9001:9001
+      - 9000:9000
+    command: ["server", "/data", "--console-address", ":9001"]
+
+  postgres:
+    image: postgres:16.4
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./postgres/codump.sql:/home/codump.sql
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - 5433:5432
+
+  mariadb:
+      image: mariadb:10.5.8
+      ports:
+        - 3306:3306
+      volumes:
+        - mariadb_data:/var/lib/mysql:Z
+      environment:
+        - MYSQL_ROOT_PASSWORD=admin
+        - MYSQL_USER=admin
+        - MYSQL_PASSWORD=admin
+        - MYSQL_DATABASE=metastore_db
+
+  hive-metastore:
+      image: 'bitsondatadev/hive-metastore:latest'
+      ports:
+        - 9083:9083
+      volumes:
+        - ./hive/metastore-site.xml:/opt/apache-hive-metastore-3.0.0-bin/conf/metastore-site.xml:ro
+      environment:
+        - METASTORE_DB_HOSTNAME=mariadb
+      depends_on:
+        - mariadb
+
+  airflow:
+    image: artsh8/ice-demo-airflow
+    # build:
+    #   context: ./airflow
+    #   dockerfile: ./Dockerfile
+    ports:
+      - 8082:8080
+    volumes:
+      - ./airflow/dags:/root/airflow/dags
+      - ./airflow/ice_common:/root/airflow/ice_common
+      - ./airflow/dbt/ice_warehouse:/root/airflow/dbt/ice_warehouse
+    environment:
+      - PYTHONPATH=$PYTHONPATH:/root/airflow/ice_common
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+
+volumes:
+  pg_data:
+    driver: local
+  mariadb_data:
+    driver: local
+  minio_data:
+    driver: local

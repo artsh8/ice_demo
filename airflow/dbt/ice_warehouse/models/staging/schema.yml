@@ -1,0 +1,64 @@
+version: 2
+
+models:
+  - name: customer_base
+    description: Базовый покупатель
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
+
+  - name: merchant_base
+    description: Базовый продавец
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
+
+  - name: product_base
+    description: Базовый продукт
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
+      - name: merchant_id
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('merchant_base')
+              field: id
+
+  - name: product_order_base
+    description: Базовая единица заказа
+    columns:
+      - name: product_order_id
+        data_tests:
+          - unique
+          - not_null
+      - name: order_id
+        data_tests:
+          - not_null
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('product_base')
+              field: id
+      - name: merchant_id
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('merchant_base')
+              field: id
+      - name: customer_id
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('customer_base')
+              field: id
+      - name: amount
+        data_tests:
+          - assert_positive_values
